@@ -3,7 +3,7 @@ kind: StatefulSet
 metadata:
   labels:
     k8s-app: infra-etcd-cluster
-    app: etcd
+    app: infra-etcd
   name: infra-etcd-cluster
   namespace: default
 spec:
@@ -11,13 +11,13 @@ spec:
   selector:
     matchLabels:
       k8s-app: infra-etcd-cluster
-      app: etcd
+      app: infra-etcd
   serviceName: infra-etcd-cluster
   template:
     metadata:
       labels:
         k8s-app: infra-etcd-cluster
-        app: etcd
+        app: infra-etcd
       name: infra-etcd-cluster
     spec:
       containers:

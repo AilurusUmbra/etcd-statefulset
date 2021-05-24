@@ -5,7 +5,7 @@ metadata:
     k8s-app: infra-etcd-cluster
     app: infra-etcd
   name: infra-etcd-cluster
-  namespace: default
+  namespace: magnum-etcd
 spec:
   clusterIP: None
   ports:

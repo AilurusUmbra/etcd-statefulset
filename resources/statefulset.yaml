@@ -3,9 +3,9 @@ kind: StatefulSet
 metadata:
   labels:
     k8s-app: infra-etcd-cluster
-    app: infra-etcd
+    app: etcd
   name: infra-etcd-cluster
-  namespace: default
+  namespace: magnum-etcd
 spec:
   replicas: 3
   selector:
@@ -51,6 +51,7 @@ spec:
           # etcd-SET_ID
           SET_ID=${HOSTNAME##*-}
           # adding a new member to existing cluster (assuming all initial pods are available)
+          echo "SET_ID ${SET_ID}"
           if [ "${SET_ID}" -ge ${INITIAL_CLUSTER_SIZE} ]; then
               export ETCDCTL_ENDPOINTS=$(eps)
 
@@ -92,13 +93,15 @@ spec:
               source /var/run/etcd/new_member_envs
 
               exec etcd --name ${HOSTNAME} \
+                  --enable-v2 \ 
                   --initial-advertise-peer-urls http://${HOSTNAME}.${SET_NAME}.${CLUSTER_NAMESPACE}:2380 \
                   --listen-peer-urls http://0.0.0.0:2380 \
                   --listen-client-urls http://0.0.0.0:2379 \
                   --advertise-client-urls http://${HOSTNAME}.${SET_NAME}.${CLUSTER_NAMESPACE}:2379 \
                   --data-dir /var/run/etcd/default.etcd \
                   --initial-cluster ${ETCD_INITIAL_CLUSTER} \
-                  --initial-cluster-state ${ETCD_INITIAL_CLUSTER_STATE}
+                  --initial-cluster-state ${ETCD_INITIAL_CLUSTER_STATE}\
+                  --heartbeat-interval 300
           fi
 
           for i in $(seq 0 $((${INITIAL_CLUSTER_SIZE} - 1))); do
@@ -129,14 +132,14 @@ spec:
             fieldRef:
               fieldPath: metadata.namespace
         - name: ETCDAPI_VERSION
-          value: "3"
+          value: "2"
         - name: ROOT_PASSWORD
           value: '@123#'
         - name: SET_NAME
           value: "infra-etcd-cluster"
         - name: GOMAXPROCS
           value: "4"
-        image: gcr.io/etcd-development/etcd:v3.3.8
+        image: quay.io/coreos/etcd:v3.2.32
         imagePullPolicy: Always
         lifecycle:
           preStop:
@@ -201,9 +204,7 @@ spec:
     spec:
       accessModes:
       - ReadWriteOnce
+      storageClassName: "mongodb-csi-rbd-sc"
       resources:
         requests:
-          storage: 1Gi
-      selector:
-        matchLabels:
-          k8s.cloud/storage-type: ceph
+          storage: 10Gi

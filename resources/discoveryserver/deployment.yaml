@@ -1,0 +1,31 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: discovery-deployment
+  namespace: magnum-etcd
+  labels:
+    app: discovery
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: discovery
+  template:
+    metadata:
+      labels:
+        app: discovery
+    spec:
+      containers:
+        - name: discoveryserver
+          image: ${REGISTRY}/${IMAGE}:${TAG}
+          env:
+            - name: DISC_ADDR
+              value: ":8087"
+            - name: DISC_HOST
+              value: "http://0.0.0.0"
+            - name: DISC_ETCD
+              value: "http://{ETCD_ENDPOINT}:2379"
+          ports:
+            - name: discovery
+              containerPort: 8087
+              protocol: TCP

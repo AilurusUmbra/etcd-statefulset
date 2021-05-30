@@ -139,7 +139,7 @@ spec:
           value: "infra-etcd-cluster"
         - name: GOMAXPROCS
           value: "4"
-        image: quay.io/coreos/etcd:v3.2.32
+        image: quay.io/coreos/etcd:v3.4.16
         imagePullPolicy: Always
         lifecycle:
           preStop:

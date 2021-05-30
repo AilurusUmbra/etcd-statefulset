@@ -1,10 +1,11 @@
 ## 部署順序
 
-### 1. Service
-kubectl apply -f service.yaml -f service-client.yaml -f discovery_service.yaml
 
-### 2. ETCD
-kubectl apply -f statefulset.yaml
+### 1. ETCD
+kubectl apply -f etcd/
 
-### 3. Discovery Server
-kubectl apply -f discovery_deploy.yaml
+### 2. Discovery Server
+kubectl apply -f discoveryserver/
+
+### 3. Network Policy
+kubectl apply -f networkpolicy.yaml
